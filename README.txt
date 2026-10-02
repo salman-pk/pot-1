@@ -5,7 +5,7 @@ STEP 2  Left menu > SQL Editor > New query. Paste everything from supabase-setup
 STEP 3  Left menu > Project Settings > API. Copy "Project URL" and the "anon public" key.
         Open config.js and paste them between the quotes. Save.
 STEP 4  Left menu > Authentication > Users > Add user > Create new user.
-        Email: admin@example.com   Password: Admin@123   (tick "Auto Confirm User")
+        Email: *******  Password: **********  (tick "Auto Confirm User")
         This is your TEST login. Change the password in Admin > Security right after logging in.
 STEP 5  Authentication > Sign In / Providers (or Settings) > turn OFF "Allow new users to sign up". Important for safety.
 STEP 6  Deploy:
