@@ -18,6 +18,25 @@ h+='<section class="wrap" id="services"><h2>'+esc(S.title)+'</h2><p class="lead"
 h+='<section class="wrap contact" id="contact"><h2>'+esc(C.title)+'</h2><p class="lead">'+nl(C.intro)+'</p><a class="mail" href="mailto:'+esc(C.email)+'">'+esc(C.email)+'</a><div class="cta"><a class="btn" href="mailto:'+esc(C.email)+'">Send an email</a>'+(wa?'<a class="btn ghost" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">Chat on WhatsApp</a>':'')+'</div></section>';
 document.getElementById('app').innerHTML=h;
 document.getElementById('foot').innerHTML='<div class="wrap">'+Object.keys(C.social||{}).filter(function(k){return C.social[k]}).map(function(k){return'<a href="'+esc(C.social[k])+'" target="_blank" rel="noopener">'+esc(k.charAt(0).toUpperCase()+k.slice(1))+'</a>'}).join(' ')+'<p>&copy; '+new Date().getFullYear()+' '+esc(H.brand)+'</p></div>'+(wa?'<a class="wa" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">WhatsApp</a>':'');
+var mb=document.getElementById('menu-btn'),sn=document.getElementById('site-nav');
+if(mb&&sn){
+ mb.addEventListener('click',function(e){
+  e.stopPropagation();var o=sn.classList.toggle('open');
+  mb.setAttribute('aria-expanded',o);var t=mb.querySelector('span');if(t)t.textContent=o?'Close':'More';
+ });
+ sn.addEventListener('click',function(e){
+  if(e.target.tagName==='A'){
+   sn.classList.remove('open');mb.setAttribute('aria-expanded','false');
+   var t=mb.querySelector('span');if(t)t.textContent='More';
+  }
+ });
+ document.addEventListener('click',function(e){
+  if(!sn.contains(e.target)&&!mb.contains(e.target)&&sn.classList.contains('open')){
+   sn.classList.remove('open');mb.setAttribute('aria-expanded','false');
+   var t=mb.querySelector('span');if(t)t.textContent='More';
+  }
+ });
+}
 function load(th,auto){var p=P[th.dataset.i],id=th.dataset.id;if(!id||th.querySelector('iframe'))return;
  var q=new URLSearchParams({autoplay:1,mute:(auto||p.mu)?1:0,controls:p.ct===false?0:1,loop:p.lp?1:0,rel:0,modestbranding:1,playsinline:1});
  if(p.lp)q.set('playlist',id);if(parseInt(p.st))q.set('start',parseInt(p.st));
