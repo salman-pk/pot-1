@@ -14,6 +14,11 @@ nav a:hover,nav a.on{color:var(--text);background:color-mix(in srgb,var(--o) 14%
 .btn{display:inline-block;background:var(--text);color:var(--bg);padding:12px 24px;border-radius:99px;font-weight:600;border:1px solid transparent;cursor:pointer;font-family:inherit;font-size:15px;transition:.3s}
 .btn:hover{background:var(--o);color:#fff;box-shadow:0 0 28px var(--glow),0 0 60px color-mix(in srgb,var(--o) 25%,transparent);transform:translateY(-2px)}
 .btn.ghost{background:transparent;color:var(--text);border-color:var(--line)}.btn.ghost:hover{border-color:var(--o);color:var(--o);background:transparent}
+.btn.btn-white{background:#fff!important;color:#0d0b0a!important;border:1px solid #fff!important}
+.btn.btn-white:hover{background:#ededed!important;border-color:#ededed!important;color:#0d0b0a!important;box-shadow:0 0 24px rgba(255,255,255,.3)!important;transform:translateY(-2px)}
+.btn.btn-orange{background:var(--o)!important;color:#fff!important;border:1px solid var(--o)!important;box-shadow:0 0 22px var(--glow)!important}
+.btn.btn-orange:hover{background:color-mix(in srgb,var(--o) 85%,#fff)!important;border-color:color-mix(in srgb,var(--o) 85%,#fff)!important;color:#fff!important;box-shadow:0 0 32px var(--glow),0 0 60px color-mix(in srgb,var(--o) 25%,transparent)!important;transform:translateY(-2px)}
+.cta .btn{height:48px;padding:0 24px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;border-radius:99px;box-sizing:border-box;line-height:1;text-align:center}
 #menu-btn{display:none}
 .hero{display:grid;grid-template-columns:1.25fr 1fr;gap:40px;align-items:center;min-height:82vh;padding-top:40px;padding-bottom:40px;background:radial-gradient(55% 55% at 80% 40%,color-mix(in srgb,var(--o) 30%,transparent),transparent 70%)}
 .hi{font:italic 400 clamp(44px,8vw,96px)/1 'Instrument Serif',Georgia,serif;color:var(--o)}
@@ -35,8 +40,9 @@ nav a:hover,nav a.on{color:var(--text);background:color-mix(in srgb,var(--o) 14%
 .card:hover .play{transform:scale(1.15)}
 .meta{padding:16px 18px}.meta h3{font-size:22px}.meta em{font-style:normal;color:var(--mute);font-size:13px}
 .sv{padding:26px}.sv h3{font-size:24px;margin-bottom:10px}.sv p{color:var(--mute);margin-bottom:12px}.sv strong{color:var(--o)}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px}
-.filters button{background:var(--card);color:var(--mute);border:1px solid var(--line);padding:8px 18px;border-radius:99px;cursor:pointer;font:inherit;transition:.25s}
+.filters{display:flex;gap:8px;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;margin-bottom:24px;padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filters button{flex-shrink:0;white-space:nowrap;background:var(--card);color:var(--mute);border:1px solid var(--line);padding:8px 18px;border-radius:99px;cursor:pointer;font:inherit;transition:.25s}
 .filters button:hover,.filters .on{color:var(--text);border-color:var(--o);box-shadow:0 0 18px var(--glow)}
 .more{margin-top:32px}
 .two{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:start}.two p{color:var(--mute);margin-bottom:16px}
@@ -67,6 +73,8 @@ footer{border-top:1px solid var(--line);margin-top:80px;padding:28px 0;text-alig
 #featured{display:none!important}
 .nav-feat,#site-nav a[href="#featured"]{display:none!important}
 #about .photo{display:none!important}
+.cta{gap:10px}
+.cta .btn{height:44px;padding:0 18px;font-size:14px}
 .hero,.two,.skills{grid-template-columns:1fr}.photo{margin:0;max-width:300px;font-size:90px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 :root{--bg:#0d0b0a;--bg2:#171210;--card:#1c1613;--text:#f6efe9;--mute:#a89a90;--line:#2e2520;--o:#ff6a00}
