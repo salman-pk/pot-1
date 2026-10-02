@@ -66,6 +66,7 @@ footer{border-top:1px solid var(--line);margin-top:80px;padding:28px 0;text-alig
 #site-nav a{padding:10px 16px;font-size:15px;border-radius:10px;width:100%}
 #featured{display:none!important}
 .nav-feat,#site-nav a[href="#featured"]{display:none!important}
+#about .photo{display:none!important}
 .hero,.two,.skills{grid-template-columns:1fr}.photo{margin:0;max-width:300px;font-size:90px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 :root{--bg:#0d0b0a;--bg2:#171210;--card:#1c1613;--text:#f6efe9;--mute:#a89a90;--line:#2e2520;--o:#ff6a00}
