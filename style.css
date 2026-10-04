@@ -112,14 +112,15 @@ button.play{border:0;cursor:pointer;padding:0}.card.v .th{aspect-ratio:9/16}
 .fc-slide:not(.fc-active) .fc-play-btn svg{width:42px;height:42px}
 .fc-info{padding:14px 18px;background:var(--card);border-top:1px solid var(--line)}
 .fc-info h3{font-size:clamp(14px,2.2vw,20px);margin:0;color:var(--text);font-family:Anton,sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.5px;line-height:1.2}
-.fc-arr{position:absolute;top:50%;transform:translateY(-50%);z-index:20;
-  background:color-mix(in srgb,var(--bg) 80%,transparent);
+.fc-arr{position:absolute;top:50%;transform:translateY(-50%);z-index:25;
+  background:color-mix(in srgb,var(--bg) 85%,transparent);
   border:1px solid var(--line);color:var(--text);
   width:48px;height:48px;border-radius:50%;font-size:28px;line-height:1;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:.25s;backdrop-filter:blur(8px)}
-.fc-arr:hover{border-color:var(--o);color:var(--o);box-shadow:0 0 18px var(--glow)}
-.fc-prev{left:8px}.fc-next{right:8px}
+  transition:.25s;backdrop-filter:blur(10px);
+  box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.fc-arr:hover{border-color:var(--o);color:var(--o);box-shadow:0 0 18px var(--glow);transform:translateY(-50%) scale(1.06)}
+.fc-prev{left:calc(50% - min(290px, 40vw) - 30px)}.fc-next{right:calc(50% - min(290px, 40vw) - 30px)}
 .fc-dots{display:flex;justify-content:center;gap:8px;margin-top:4px;padding-bottom:8px}
 .fc-dot{width:8px;height:8px;border-radius:50%;background:var(--line);border:0;cursor:pointer;padding:0;transition:.3s}
 .fc-dot.on{background:var(--o);box-shadow:0 0 10px var(--glow);width:24px;border-radius:99px}
@@ -130,5 +131,5 @@ button.play{border:0;cursor:pointer;padding:0}.card.v .th{aspect-ratio:9/16}
   .fc-slide.fc-right{transform:translate3d(62%,0,-90px) scale(.8)}
   .fc-play-btn{width:54px;height:54px}.fc-play-btn svg{width:44px;height:44px}
   .fc-arr{width:36px;height:36px;font-size:20px}
-  .fc-prev{left:4px}.fc-next{right:4px}
+  .fc-prev{left:max(6px, calc(50% - min(210px, 44vw) - 10px))}.fc-next{right:max(6px, calc(50% - min(210px, 44vw) - 10px))}
 }
