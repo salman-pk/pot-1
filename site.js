@@ -23,8 +23,8 @@ function playerHtml(vidUrl,posterUrl,isAuto,isMuted,label,extraClass){
 }
 
 function card(p,i){
- var v=p.vert||false;
- return '<div class="card'+(v?' v':'')+'" data-c="'+esc(p.c)+'">'+
+ var v=p.vert||false,d=(i%3)+1;
+ return '<div class="card reveal delay-'+d+(v?' v':'')+'" data-c="'+esc(p.c)+'">'+
   playerHtml(p.v||p.u,p.img,p.ap,p.mu,p.t,'th')+
   '<div class="meta"><h3>'+esc(p.t)+'</h3><em>'+esc(p.c)+'</em></div>'+
  '</div>';
@@ -32,9 +32,9 @@ function card(p,i){
 
 var cats=P.map(function(p){return p.c}).filter(function(c,i,a){return a.indexOf(c)==i});
 var wa=String(C.whatsapp||'').replace(/\D/g,''),ini=H.brand.split(' ').map(function(w){return w[0]||''}).join('').slice(0,2).toUpperCase();
-var photo=function(u){return '<div class="photo">'+(u?'<img src="'+esc(u)+'" alt="">':'<span>'+esc(ini)+'</span>')+'</div>'};
+var photo=function(u,ext){return '<div class="photo reveal-scale '+(ext||'')+'">'+(u?'<img src="'+esc(u)+'" alt="">':'<span>'+esc(ini)+'</span>')+'</div>'};
 var cvUrl=H.cv||'cv.pdf';
-var h='<div class="hero wrap" id="home"><div><span class="badge"><i></i>'+esc(H.badge)+'</span><div class="hi">'+esc(H.hi)+'</div><h1>'+esc(H.name)+'</h1><div class="role">'+esc(H.title)+'</div><p>'+nl(H.tagline)+'</p><div class="cta"><a class="btn btn-white" href="#work">'+esc(H.cta1)+'</a><a class="btn btn-orange" href="#contact">Hire me</a><a class="btn btn-white" href="'+esc(cvUrl)+'" download="Salman-Ahmed-CV.pdf">Download CV</a></div></div>'+photo(I.profile)+'</div>';
+var h='<div class="hero wrap" id="home"><div><span class="badge reveal delay-1"><i></i>'+esc(H.badge)+'</span><div class="hi reveal delay-2">'+esc(H.hi)+'</div><h1 class="reveal delay-3">'+esc(H.name)+'</h1><div class="role reveal delay-4">'+esc(H.title)+'</div><p class="reveal delay-5">'+nl(H.tagline)+'</p><div class="cta reveal delay-6"><a class="btn btn-white" href="#work">'+esc(H.cta1)+'</a><a class="btn btn-orange" href="#contact">Hire me</a><a class="btn btn-white" href="'+esc(cvUrl)+'" download="Salman-Ahmed-CV.pdf">Download CV</a></div></div>'+photo(I.profile)+'</div>';
 var FV=Array.isArray(D.featured)&&D.featured.length?D.featured:[];
 (function buildCarousel(){
  if(!FV.length){h+='<section class="wrap" id="featured"><h2>'+esc(H.featured_title)+'</h2><p style="color:var(--mute)">No featured videos yet. Add them in the admin panel.</p></section>';return;}
@@ -44,16 +44,16 @@ var FV=Array.isArray(D.featured)&&D.featured.length?D.featured:[];
    '<div class="fc-info"><h3>'+esc(p.t)+'</h3></div>'+
   '</div>';
  }).join('');
- h+='<section id="featured"><div class="wrap"><h2>'+esc(H.featured_title)+'</h2></div>'+
-  '<div class="fc-root"><button class="fc-arr fc-prev" aria-label="Previous">&#8249;</button><div class="fc-track" id="fc-track">'+slides+'</div><button class="fc-arr fc-next" aria-label="Next">&#8250;</button></div>'+
-  '<div class="fc-dots" id="fc-dots">'+FV.map(function(_,i){return'<button class="fc-dot'+(i===0?' on':'')+'" data-fj="'+i+'" aria-label="Slide '+(i+1)+'"></button>'}).join('')+'</div>'+
+ h+='<section id="featured"><div class="wrap"><h2 class="reveal">'+esc(H.featured_title)+'</h2></div>'+
+  '<div class="fc-root reveal-scale delay-1"><button class="fc-arr fc-prev" aria-label="Previous">&#8249;</button><div class="fc-track" id="fc-track">'+slides+'</div><button class="fc-arr fc-next" aria-label="Next">&#8250;</button></div>'+
+  '<div class="fc-dots reveal delay-2" id="fc-dots">'+FV.map(function(_,i){return'<button class="fc-dot'+(i===0?' on':'')+'" data-fj="'+i+'" aria-label="Slide '+(i+1)+'"></button>'}).join('')+'</div>'+
  '</section>';
 })();
-h+='<section class="wrap" id="work"><h2>'+esc(D.portfolio.title)+'</h2><p class="lead">'+nl(D.portfolio.intro)+'</p><div class="filters"><button class="on" data-f="">All</button>'+cats.map(function(c){return'<button data-f="'+esc(c)+'">'+esc(c)+'</button>'}).join('')+'</div><div class="grid" id="pg">'+P.map(card).join('')+'</div></section>';
-h+='<section class="wrap" id="about"><h2>'+esc(A.title)+'</h2><div class="two"><div><p>'+nl(A.p1)+'</p><p>'+nl(A.p2)+'</p><div class="stats">'+A.stats.map(function(s){return'<div class="stat"><b>'+esc(s.n)+'</b><span>'+esc(s.l)+'</span></div>'}).join('')+'</div></div>'+photo(I.about||I.profile)+'</div></section>';
-h+='<section class="wrap" id="skills"><h2>'+esc(A.skills_title)+'</h2><div class="skills">'+A.skills.map(function(s){var p=Math.max(0,Math.min(100,parseInt(s.p)||0));return'<div class="sk"><div class="top"><span>'+esc(s.n)+'</span><span class="pct">'+p+'%</span></div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}).join('')+'</div></section>';
-h+='<section class="wrap" id="services"><h2>'+esc(S.title)+'</h2><p class="lead">'+nl(S.intro)+'</p><div class="grid">'+S.items.map(function(s){return'<div class="card sv"><h3>'+esc(s.t)+'</h3><p>'+nl(s.d)+'</p>'+(s.p?'<strong>'+esc(s.p)+'</strong>':'')+'</div>'}).join('')+'</div></section>';
-h+='<section class="wrap contact" id="contact"><h2>'+esc(C.title)+'</h2><p class="lead">'+nl(C.intro)+'</p><a class="mail" href="mailto:'+esc(C.email)+'">'+esc(C.email)+'</a><div class="cta"><a class="btn" href="mailto:'+esc(C.email)+'">Send an email</a>'+(wa?'<a class="btn btn-wa" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">Chat on WhatsApp</a>':'')+'</div></section>';
+h+='<section class="wrap" id="work"><h2 class="reveal">'+esc(D.portfolio.title)+'</h2><p class="lead reveal delay-1">'+nl(D.portfolio.intro)+'</p><div class="filters reveal delay-2"><button class="on" data-f="">All</button>'+cats.map(function(c){return'<button data-f="'+esc(c)+'">'+esc(c)+'</button>'}).join('')+'</div><div class="grid" id="pg">'+P.map(card).join('')+'</div></section>';
+h+='<section class="wrap" id="about"><h2 class="reveal">'+esc(A.title)+'</h2><div class="two"><div><p class="reveal delay-1">'+nl(A.p1)+'</p><p class="reveal delay-2">'+nl(A.p2)+'</p><div class="stats">'+A.stats.map(function(s,i){return'<div class="stat reveal-scale delay-'+(i+1)+'"><b>'+esc(s.n)+'</b><span>'+esc(s.l)+'</span></div>'}).join('')+'</div></div>'+photo(I.about||I.profile,'delay-2')+'</div></section>';
+h+='<section class="wrap" id="skills"><h2 class="reveal">'+esc(A.skills_title)+'</h2><div class="skills">'+A.skills.map(function(s,i){var p=Math.max(0,Math.min(100,parseInt(s.p)||0));var d=(i%2)+1;return'<div class="sk reveal delay-'+d+'"><div class="top"><span>'+esc(s.n)+'</span><span class="pct">'+p+'%</span></div><div class="bar"><i style="width:'+p+'%"></i></div></div>'}).join('')+'</div></section>';
+h+='<section class="wrap" id="services"><h2 class="reveal">'+esc(S.title)+'</h2><p class="lead reveal delay-1">'+nl(S.intro)+'</p><div class="grid">'+S.items.map(function(s,i){var d=(i%2)+1;return'<div class="card sv reveal delay-'+d+'"><h3>'+esc(s.t)+'</h3><p>'+nl(s.d)+'</p>'+(s.p?'<strong>'+esc(s.p)+'</strong>':'')+'</div>'}).join('')+'</div></section>';
+h+='<section class="wrap contact" id="contact"><h2 class="reveal">'+esc(C.title)+'</h2><p class="lead reveal delay-1">'+nl(C.intro)+'</p><a class="mail reveal delay-2" href="mailto:'+esc(C.email)+'">'+esc(C.email)+'</a><div class="cta reveal delay-3"><a class="btn" href="mailto:'+esc(C.email)+'">Send an email</a>'+(wa?'<a class="btn btn-wa" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">Chat on WhatsApp</a>':'')+'</div></section>';
 document.getElementById('app').innerHTML=h;
 
 // ── Simple Video Players Init ────────────────────────────────────────
@@ -174,7 +174,7 @@ initVideoPlayers();
  });
 })();
 
-document.getElementById('foot').innerHTML='<div class="wrap">'+Object.keys(C.social||{}).filter(function(k){return C.social[k]}).map(function(k){return'<a href="'+esc(C.social[k])+'" target="_blank" rel="noopener">'+esc(k.charAt(0).toUpperCase()+k.slice(1))+'</a>'}).join(' ')+'<p>&copy; '+new Date().getFullYear()+' '+esc(H.brand)+'</p></div>'+(wa?'<a class="wa" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">WhatsApp</a>':'');
+document.getElementById('foot').innerHTML='<div class="wrap reveal">'+Object.keys(C.social||{}).filter(function(k){return C.social[k]}).map(function(k){return'<a href="'+esc(C.social[k])+'" target="_blank" rel="noopener">'+esc(k.charAt(0).toUpperCase()+k.slice(1))+'</a>'}).join(' ')+'<p>&copy; '+new Date().getFullYear()+' '+esc(H.brand)+'</p></div>'+(wa?'<a class="wa" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">WhatsApp</a>':'');
 var mb=document.getElementById('menu-btn'),sn=document.getElementById('site-nav');
 if(mb&&sn){
  mb.addEventListener('click',function(e){
@@ -224,5 +224,20 @@ if('IntersectionObserver' in window){
   });
  },{threshold:.5});
  document.querySelectorAll('#pg .vp-wrap[data-ap="1"]').forEach(function(t){io.observe(t)});
+}
+
+// ── Scroll Reveal Observer ──────────────────────────────────────────
+if('IntersectionObserver' in window){
+ var ro=new IntersectionObserver(function(es){
+  es.forEach(function(e){
+   if(e.isIntersecting){
+    e.target.classList.add('in-view');
+    ro.unobserve(e.target);
+   }
+  });
+ },{threshold:.1,rootMargin:'0px 0px -36px 0px'});
+ document.querySelectorAll('.reveal,.reveal-scale').forEach(function(el){ro.observe(el)});
+}else{
+ document.querySelectorAll('.reveal,.reveal-scale').forEach(function(el){el.classList.add('in-view')});
 }
 })();
