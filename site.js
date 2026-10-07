@@ -59,17 +59,38 @@ document.getElementById('app').innerHTML=h;
 // ── Global Video & Audio Manager ─────────────────────────────────────
 var activeAudioVid=null;
 
-function muteAllOtherVideos(currentVid){
+function stopAllOtherVideos(activeVid){
  document.querySelectorAll('.vp-wrap video').forEach(function(other){
-  if(other!==currentVid){
-   if(!other.muted){
-    other.muted=true;
-   }
+  if(other!==activeVid){
+   other.pause();
+   other.muted=true;
    other._mutedByScroll=false;
+   other._wasPlaying=false;
    var ow=other.closest('.vp-wrap');
-   if(ow)ow.classList.add('is-muted');
+   if(ow){
+    ow.classList.add('is-muted');
+    ow.classList.remove('is-playing');
+   }
   }
  });
+}
+
+function playAndUnmuteVideo(v,wrap){
+ if(!v)return;
+ stopAllOtherVideos(v);
+ v.muted=false;
+ activeAudioVid=v;
+ v._mutedByScroll=false;
+ v._wasPlaying=true;
+ if(wrap){
+  wrap.classList.remove('is-muted');
+  wrap.classList.add('is-playing');
+ }
+ v.play().catch(function(){});
+}
+
+function muteAllOtherVideos(currentVid){
+ stopAllOtherVideos(currentVid);
 }
 
 // ── Simple Video Players Init ────────────────────────────────────────
@@ -84,7 +105,7 @@ function initVideoPlayers(){
     if(activeAudioVid!==v){
      activeAudioVid=v;
      v._mutedByScroll=false;
-     muteAllOtherVideos(v);
+     stopAllOtherVideos(v);
     }
    }
   }
@@ -98,53 +119,52 @@ function initVideoPlayers(){
    if(muteBtn){
     e.stopPropagation();
     if(v.muted){
-     v.muted=false;
-     v._mutedByScroll=false;
-     activeAudioVid=v;
-     muteAllOtherVideos(v);
-     if(v.paused){v.play().catch(function(){});}
+     playAndUnmuteVideo(v,wrap);
     }else{
      v.muted=true;
      v._mutedByScroll=false;
      if(activeAudioVid===v){activeAudioVid=null;}
+     wrap.classList.add('is-muted');
     }
-    updateState();
     return;
    }
-   var playBtn=e.target.closest('.vp-play')||e.target.closest('.vp-center-play');
-   if(playBtn||e.target===v){
-    var slide=wrap.closest('.fc-slide');
-    if(slide&&!slide.classList.contains('fc-active'))return;
-    e.stopPropagation();
-    if(v.paused){
-     if(!v.muted){
-      activeAudioVid=v;
-      v._mutedByScroll=false;
-      muteAllOtherVideos(v);
-     }else{
-      if(activeAudioVid && activeAudioVid!==v){
-       activeAudioVid.muted=true;
-       activeAudioVid._mutedByScroll=false;
-       var aw=activeAudioVid.closest('.vp-wrap');
-       if(aw)aw.classList.add('is-muted');
-       activeAudioVid=null;
-      }
-     }
-     document.querySelectorAll('.vp-wrap video').forEach(function(other){
-      if(other!==v && !other.paused){
-       other.pause();
-      }
-     });
-     v.play().catch(function(){});
-    }else{
-     v.pause();
-    }
-    updateState();
+
+   var slide=wrap.closest('.fc-slide');
+   if(slide && !slide.classList.contains('fc-active')){
+    // Side carousel slides handled by track click listener to rotate to center
+    return;
+   }
+
+   e.stopPropagation();
+   if(v.paused || v.muted){
+    // Click anywhere on video (center, sides, play button) -> start playing and unmute!
+    playAndUnmuteVideo(v,wrap);
+   }else{
+    // If playing unmuted, clicking pauses
+    v.pause();
+    wrap.classList.remove('is-playing');
    }
   });
  });
 }
 initVideoPlayers();
+
+// Click anywhere on portfolio card to play and unmute
+document.addEventListener('click',function(e){
+ var c=e.target.closest('#pg .card');
+ if(c && !e.target.closest('.vp-wrap') && !e.target.closest('a,button')){
+  var wrap=c.querySelector('.vp-wrap');
+  var v=wrap?wrap.querySelector('video'):null;
+  if(v && wrap){
+   if(v.paused || v.muted){
+    playAndUnmuteVideo(v,wrap);
+   }else{
+    v.pause();
+    wrap.classList.remove('is-playing');
+   }
+  }
+ }
+});
 
 // ── Featured Carousel Init ──────────────────────────────────────────
 (function initCarousel(){
@@ -166,7 +186,10 @@ initVideoPlayers();
      v._mutedByScroll=false;
      activeAudioVid=null;
      var w=v.closest('.vp-wrap');
-     if(w)w.classList.add('is-muted');
+     if(w){
+      w.classList.add('is-muted');
+      w.classList.remove('is-playing');
+     }
     }
    }
   });
@@ -178,9 +201,9 @@ initVideoPlayers();
   v.play().catch(function(){});
  }
 
- function goTo(idx,autoPlay){
+ function goTo(idx,autoPlay,shouldUnmute){
   var prevActive=slides[cur];
-  var wasPlaying=prevActive?(!prevActive.querySelector('video')?.paused):false;
+  var wasAudible=prevActive?(prevActive.querySelector('video')&&!prevActive.querySelector('video').muted):false;
   stopAll();
   cur=((idx%n)+n)%n;
   var leftIdx=((cur-1)+n)%n;
@@ -201,22 +224,29 @@ initVideoPlayers();
   }
 
   var newActive=slides[cur];
-  var fv=FV[cur];
-  if(newActive&&(autoPlay||wasPlaying||(fv&&fv.ap!==false))){
-   playSlide(newActive);
+  if(newActive){
+   var newWrap=newActive.querySelector('.vp-wrap');
+   var newVid=newActive.querySelector('video');
+   if(newVid&&newWrap){
+    if(shouldUnmute || wasAudible){
+     playAndUnmuteVideo(newVid,newWrap);
+    }else if(autoPlay){
+     newVid.play().catch(function(){});
+    }
+   }
   }
  }
 
  goTo(cur);
 
  var prev=document.querySelector('.fc-prev'),next=document.querySelector('.fc-next');
- if(prev)prev.addEventListener('click',function(e){e.stopPropagation();goTo(cur+1);});
- if(next)next.addEventListener('click',function(e){e.stopPropagation();goTo(cur-1);});
+ if(prev)prev.addEventListener('click',function(e){e.stopPropagation();goTo(cur+1,true);});
+ if(next)next.addEventListener('click',function(e){e.stopPropagation();goTo(cur-1,true);});
 
  if(dotsEl){
   dotsEl.addEventListener('click',function(e){
    var d=e.target.closest('[data-fj]');
-   if(d)goTo(+d.dataset.fj);
+   if(d)goTo(+d.dataset.fj,true,true);
   });
  }
 
@@ -237,20 +267,20 @@ initVideoPlayers();
   var dt=Date.now()-tTime;
   if(Math.abs(dx)>35 && Math.abs(dx)>Math.abs(dy) && dt<650){
    if(dx<0){
-    goTo(cur-1);
+    goTo(cur-1,true);
    }else{
-    goTo(cur+1);
+    goTo(cur+1,true);
    }
   }
  },{passive:true});
 
- // Click on slide
+ // Click on slide (click side slide -> move to center and play unmuted)
  track.addEventListener('click',function(e){
   var slide=e.target.closest('.fc-slide');
   if(!slide)return;
   var idx=+slide.dataset.fi;
   if(idx!==cur){
-   goTo(idx,true);
+   goTo(idx,true,true);
   }
  });
 })();
