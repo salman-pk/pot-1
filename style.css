@@ -115,6 +115,9 @@ html{scroll-padding-top:84px}.hero{margin-top:0}h2{scroll-margin-top:84px}
 .vp-mute .ico-muted{display:none}
 .vp-wrap.is-muted .vp-mute .ico-unmuted{display:none}
 .vp-wrap.is-muted .vp-mute .ico-muted{display:block}
+.vp-spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--o);animation:vp-spin .7s linear infinite;pointer-events:none;z-index:6;opacity:0;transition:opacity .2s ease}
+.vp-wrap.is-buffering .vp-spinner{opacity:1}
+@keyframes vp-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
 /* ── Featured Carousel ─────────────────────────────────────────── */
 #featured{padding:0 0 60px;overflow:hidden}
@@ -161,6 +164,7 @@ html{scroll-padding-top:84px}.hero{margin-top:0}h2{scroll-margin-top:84px}
   .fc-info{padding:10px 14px}
   .fc-info h3{font-size:clamp(14px,3.6vw,18px)}
   .vp-center-play{width:48px;height:48px}.vp-center-play svg{width:40px;height:40px}
+  .vp-spinner{width:36px;height:36px}
   .vp-btn{width:36px;height:36px}
   .vp-bar{bottom:8px;left:8px;right:8px}
   .fc-arr{width:38px;height:38px;font-size:22px;z-index:25}

@@ -7,13 +7,15 @@ var H=D.home,A=D.about,S=D.services,C=D.contact,I=D.images||{},P=D.projects||[];
 var nl=function(s){return esc(s).replace(/\n/g,'<br>')};
 document.title=H.brand+' | Video Editor';document.getElementById('logo').innerHTML=esc(H.brand)+'<b>.</b>';
 
-function playerHtml(vidUrl,posterUrl,isAuto,isMuted,label,extraClass){
+function playerHtml(vidUrl,posterUrl,isAuto,isMuted,label,extraClass,eager){
  var vid=esc(vidUrl||''),post=esc(posterUrl||''),auto=isAuto?'1':'0',mu=isMuted!==false?'1':'0';
  if(!vid){
   return '<div class="vp-wrap '+(extraClass||'')+'">'+(post?'<img src="'+post+'" alt="'+esc(label||'')+'" loading="lazy">':'<span class="ph"></span>')+'</div>';
  }
  return '<div class="vp-wrap '+(extraClass||'')+'" data-ap="'+auto+'" data-mu="'+mu+'">'+
-  '<video class="vp-vid" src="'+vid+'"'+(post?' poster="'+post+'"':'')+' playsinline webkit-playsinline preload="metadata" loop'+(isMuted!==false?' muted':'')+'></video>'+
+  (post?'<img class="vp-poster" src="'+post+'" alt="'+esc(label||'')+'" loading="lazy">':'')+
+  '<video class="vp-vid" '+(eager?'src="'+vid+'" preload="metadata"':'data-src="'+vid+'" preload="none"')+' playsinline webkit-playsinline loop'+(isMuted!==false?' muted':'')+'></video>'+
+  '<div class="vp-spinner" aria-hidden="true"></div>'+
   '<button class="vp-center-play" aria-label="Play '+esc(label||'')+'"><svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="29" stroke="rgba(255,255,255,.25)" stroke-width="2"/><path d="M24 20l20 10-20 10V20z" fill="#fff"/></svg></button>'+
   '<div class="vp-bar">'+
    '<button class="vp-btn vp-play" aria-label="Play or Pause"><svg class="ico-play" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><svg class="ico-pause" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg></button>'+
@@ -25,7 +27,7 @@ function playerHtml(vidUrl,posterUrl,isAuto,isMuted,label,extraClass){
 function card(p,i){
  var v=p.vert||false,d=(i%3)+1;
  return '<div class="card reveal delay-'+d+(v?' v':'')+'" data-c="'+esc(p.c)+'">'+
-  playerHtml(p.v||p.u,p.img,p.ap,p.mu,p.t,'th')+
+  playerHtml(p.v||p.u,p.img,p.ap,p.mu,p.t,'th',false)+
   '<div class="meta"><h3>'+esc(p.t)+'</h3><em>'+esc(p.c)+'</em></div>'+
  '</div>';
 }
@@ -38,15 +40,16 @@ var h='<div class="hero wrap" id="home"><div><span class="badge reveal delay-1">
 var FV=Array.isArray(D.featured)&&D.featured.length?D.featured:[];
 (function buildCarousel(){
  if(!FV.length){h+='<section class="wrap" id="featured"><h2>'+esc(H.featured_title)+'</h2><p style="color:var(--mute)">No featured videos yet. Add them in the admin panel.</p></section>';return;}
+ var centerIdx=Math.floor(FV.length/2)||0;
  var slides=FV.map(function(p,i){
   return '<div class="fc-slide" data-fi="'+i+'">'+
-   '<div class="fc-thumb">'+playerHtml(p.v||p.u,p.img,p.ap!==false,p.mu!==false,p.t,'fc-player')+'</div>'+
+   '<div class="fc-thumb">'+playerHtml(p.v||p.u,p.img,p.ap!==false,p.mu!==false,p.t,'fc-player',i===centerIdx)+'</div>'+
    '<div class="fc-info"><h3>'+esc(p.t)+'</h3></div>'+
   '</div>';
  }).join('');
  h+='<section id="featured"><div class="wrap"><h2 class="reveal">'+esc(H.featured_title)+'</h2></div>'+
   '<div class="fc-root reveal-scale delay-1"><button class="fc-arr fc-prev" aria-label="Previous">&#8249;</button><div class="fc-track" id="fc-track">'+slides+'</div><button class="fc-arr fc-next" aria-label="Next">&#8250;</button></div>'+
-  '<div class="fc-dots reveal delay-2" id="fc-dots">'+FV.map(function(_,i){return'<button class="fc-dot'+(i===0?' on':'')+'" data-fj="'+i+'" aria-label="Slide '+(i+1)+'"></button>'}).join('')+'</div>'+
+  '<div class="fc-dots reveal delay-2" id="fc-dots">'+FV.map(function(_,i){return'<button class="fc-dot'+(i===centerIdx?' on':'')+'" data-fj="'+i+'" aria-label="Slide '+(i+1)+'"></button>'}).join('')+'</div>'+
  '</section>';
 })();
 h+='<section class="wrap" id="work"><h2 class="reveal">'+esc(D.portfolio.title)+'</h2><p class="lead reveal delay-1">'+nl(D.portfolio.intro)+'</p><div class="filters reveal delay-2"><button class="on" data-f="">All</button>'+cats.map(function(c){return'<button data-f="'+esc(c)+'">'+esc(c)+'</button>'}).join('')+'</div><div class="grid" id="pg">'+P.map(card).join('')+'</div></section>';
@@ -59,6 +62,18 @@ document.getElementById('app').innerHTML=h;
 // ── Global Video & Audio Manager ─────────────────────────────────────
 var activeAudioVid=null;
 
+function prepareVideo(v,prioritize){
+ if(!v)return;
+ if(!v.src && v.dataset.src){
+  v.src=v.dataset.src;
+ }
+ if(prioritize){
+  v.preload='auto';
+ }else if(v.preload==='none'){
+  v.preload='metadata';
+ }
+}
+
 function stopAllOtherVideos(activeVid){
  document.querySelectorAll('.vp-wrap video').forEach(function(other){
   if(other!==activeVid){
@@ -66,10 +81,13 @@ function stopAllOtherVideos(activeVid){
    other.muted=true;
    other._mutedByScroll=false;
    other._wasPlaying=false;
+   if(other.preload==='auto'){
+    other.preload='metadata';
+   }
    var ow=other.closest('.vp-wrap');
    if(ow){
     ow.classList.add('is-muted');
-    ow.classList.remove('is-playing');
+    ow.classList.remove('is-playing','is-buffering');
    }
   }
  });
@@ -78,6 +96,7 @@ function stopAllOtherVideos(activeVid){
 function playAndUnmuteVideo(v,wrap){
  if(!v)return;
  stopAllOtherVideos(v);
+ prepareVideo(v,true);
  v.muted=false;
  activeAudioVid=v;
  v._mutedByScroll=false;
@@ -112,6 +131,12 @@ function initVideoPlayers(){
   v.addEventListener('play',updateState);
   v.addEventListener('pause',updateState);
   v.addEventListener('volumechange',updateState);
+  v.addEventListener('waiting',function(){wrap.classList.add('is-buffering');});
+  v.addEventListener('playing',function(){wrap.classList.remove('is-buffering');});
+  v.addEventListener('canplay',function(){wrap.classList.remove('is-buffering');});
+  v.addEventListener('seeking',function(){wrap.classList.add('is-buffering');});
+  v.addEventListener('seeked',function(){wrap.classList.remove('is-buffering');});
+  v.addEventListener('error',function(){wrap.classList.remove('is-buffering');});
   updateState();
 
   wrap.addEventListener('click',function(e){
@@ -142,7 +167,7 @@ function initVideoPlayers(){
    }else{
     // If playing unmuted, clicking pauses
     v.pause();
-    wrap.classList.remove('is-playing');
+    wrap.classList.remove('is-playing','is-buffering');
    }
   });
  });
@@ -160,7 +185,7 @@ document.addEventListener('click',function(e){
     playAndUnmuteVideo(v,wrap);
    }else{
     v.pause();
-    wrap.classList.remove('is-playing');
+    wrap.classList.remove('is-playing','is-buffering');
    }
   }
  }
@@ -181,6 +206,7 @@ document.addEventListener('click',function(e){
    var v=s.querySelector('video');
    if(v){
     v.pause();
+    if(v.preload==='auto')v.preload='metadata';
     if(activeAudioVid===v){
      v.muted=true;
      v._mutedByScroll=false;
@@ -188,7 +214,7 @@ document.addEventListener('click',function(e){
      var w=v.closest('.vp-wrap');
      if(w){
       w.classList.add('is-muted');
-      w.classList.remove('is-playing');
+      w.classList.remove('is-playing','is-buffering');
      }
     }
    }
@@ -198,6 +224,7 @@ document.addEventListener('click',function(e){
  function playSlide(slide){
   var v=slide.querySelector('video');
   if(!v)return;
+  prepareVideo(v);
   v.play().catch(function(){});
  }
 
@@ -223,6 +250,13 @@ document.addEventListener('click',function(e){
    });
   }
 
+  [cur,leftIdx,rightIdx].forEach(function(ci){
+   if(slides[ci]){
+    var sv=slides[ci].querySelector('video');
+    if(sv)prepareVideo(sv);
+   }
+  });
+
   var newActive=slides[cur];
   if(newActive){
    var newWrap=newActive.querySelector('.vp-wrap');
@@ -231,6 +265,7 @@ document.addEventListener('click',function(e){
     if(shouldUnmute || wasAudible){
      playAndUnmuteVideo(newVid,newWrap);
     }else if(autoPlay){
+     prepareVideo(newVid);
      newVid.play().catch(function(){});
     }
    }
@@ -332,6 +367,33 @@ document.addEventListener('click',function(e){
  }
 });
 
+// ── Progressive Video Lazy Loader ────────────────────────────────────
+if('IntersectionObserver' in window){
+ var lazyVideoObserver=new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+   if(entry.isIntersecting){
+    var wrap=entry.target;
+    var v=wrap.querySelector('video');
+    if(v){
+     prepareVideo(v);
+     lazyVideoObserver.unobserve(wrap);
+    }
+   }
+  });
+ },{rootMargin:'250px 0px'});
+
+ document.querySelectorAll('.vp-wrap').forEach(function(wrap){
+  var v=wrap.querySelector('video');
+  if(v && !v.src){
+   lazyVideoObserver.observe(wrap);
+  }
+ });
+}else{
+ document.querySelectorAll('.vp-wrap video').forEach(function(v){
+  prepareVideo(v);
+ });
+}
+
 // ── Video Viewport & Audio Observer ─────────────────────────────────
 if('IntersectionObserver' in window){
  var vio=new IntersectionObserver(function(es){
@@ -342,12 +404,15 @@ if('IntersectionObserver' in window){
 
    if(e.isIntersecting){
     // Video has entered the viewport
+    prepareVideo(v);
+
     // 1. Restore previous audio state if this video was playing with sound when scrolled away
     if(activeAudioVid===v && v._mutedByScroll){
      v.muted=false;
      v._mutedByScroll=false;
      wrap.classList.remove('is-muted');
      if(v._wasPlaying){
+      prepareVideo(v,true);
       v.play().catch(function(){});
       v._wasPlaying=false;
      }
@@ -373,6 +438,10 @@ if('IntersectionObserver' in window){
     }
     // 2. Pause video while out of view to preserve resources (playback position is preserved)
     v.pause();
+    wrap.classList.remove('is-playing','is-buffering');
+    if(v.preload==='auto'){
+     v.preload='metadata';
+    }
    }
   });
  },{threshold:0.15});
