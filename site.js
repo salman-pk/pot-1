@@ -56,6 +56,22 @@ h+='<section class="wrap" id="services"><h2 class="reveal">'+esc(S.title)+'</h2>
 h+='<section class="wrap contact" id="contact"><h2 class="reveal">'+esc(C.title)+'</h2><p class="lead reveal delay-1">'+nl(C.intro)+'</p><a class="mail reveal delay-2" href="mailto:'+esc(C.email)+'">'+esc(C.email)+'</a><div class="cta reveal delay-3"><a class="btn" href="mailto:'+esc(C.email)+'">Send an email</a>'+(wa?'<a class="btn btn-wa" href="https://wa.me/'+wa+'" target="_blank" rel="noopener">Chat on WhatsApp</a>':'')+'</div></section>';
 document.getElementById('app').innerHTML=h;
 
+// ── Global Video & Audio Manager ─────────────────────────────────────
+var activeAudioVid=null;
+
+function muteAllOtherVideos(currentVid){
+ document.querySelectorAll('.vp-wrap video').forEach(function(other){
+  if(other!==currentVid){
+   if(!other.muted){
+    other.muted=true;
+   }
+   other._mutedByScroll=false;
+   var ow=other.closest('.vp-wrap');
+   if(ow)ow.classList.add('is-muted');
+  }
+ });
+}
+
 // ── Simple Video Players Init ────────────────────────────────────────
 function initVideoPlayers(){
  document.querySelectorAll('.vp-wrap').forEach(function(wrap){
@@ -64,6 +80,13 @@ function initVideoPlayers(){
   function updateState(){
    wrap.classList.toggle('is-playing',!v.paused);
    wrap.classList.toggle('is-muted',!!v.muted);
+   if(!v.paused && !v.muted){
+    if(activeAudioVid!==v){
+     activeAudioVid=v;
+     v._mutedByScroll=false;
+     muteAllOtherVideos(v);
+    }
+   }
   }
   v.addEventListener('play',updateState);
   v.addEventListener('pause',updateState);
@@ -74,7 +97,18 @@ function initVideoPlayers(){
    var muteBtn=e.target.closest('.vp-mute');
    if(muteBtn){
     e.stopPropagation();
-    v.muted=!v.muted;
+    if(v.muted){
+     v.muted=false;
+     v._mutedByScroll=false;
+     activeAudioVid=v;
+     muteAllOtherVideos(v);
+     if(v.paused){v.play().catch(function(){});}
+    }else{
+     v.muted=true;
+     v._mutedByScroll=false;
+     if(activeAudioVid===v){activeAudioVid=null;}
+    }
+    updateState();
     return;
    }
    var playBtn=e.target.closest('.vp-play')||e.target.closest('.vp-center-play');
@@ -82,8 +116,30 @@ function initVideoPlayers(){
     var slide=wrap.closest('.fc-slide');
     if(slide&&!slide.classList.contains('fc-active'))return;
     e.stopPropagation();
-    if(v.paused){v.play().catch(function(){});}
-    else{v.pause();}
+    if(v.paused){
+     if(!v.muted){
+      activeAudioVid=v;
+      v._mutedByScroll=false;
+      muteAllOtherVideos(v);
+     }else{
+      if(activeAudioVid && activeAudioVid!==v){
+       activeAudioVid.muted=true;
+       activeAudioVid._mutedByScroll=false;
+       var aw=activeAudioVid.closest('.vp-wrap');
+       if(aw)aw.classList.add('is-muted');
+       activeAudioVid=null;
+      }
+     }
+     document.querySelectorAll('.vp-wrap video').forEach(function(other){
+      if(other!==v && !other.paused){
+       other.pause();
+      }
+     });
+     v.play().catch(function(){});
+    }else{
+     v.pause();
+    }
+    updateState();
    }
   });
  });
@@ -103,7 +159,16 @@ initVideoPlayers();
  function stopAll(){
   slides.forEach(function(s){
    var v=s.querySelector('video');
-   if(v){v.pause();}
+   if(v){
+    v.pause();
+    if(activeAudioVid===v){
+     v.muted=true;
+     v._mutedByScroll=false;
+     activeAudioVid=null;
+     var w=v.closest('.vp-wrap');
+     if(w)w.classList.add('is-muted');
+    }
+   }
   });
  }
 
@@ -145,8 +210,8 @@ initVideoPlayers();
  goTo(cur);
 
  var prev=document.querySelector('.fc-prev'),next=document.querySelector('.fc-next');
- if(prev)prev.addEventListener('click',function(){goTo(cur+1);});
- if(next)next.addEventListener('click',function(){goTo(cur-1);});
+ if(prev)prev.addEventListener('click',function(e){e.stopPropagation();goTo(cur+1);});
+ if(next)next.addEventListener('click',function(e){e.stopPropagation();goTo(cur-1);});
 
  if(dotsEl){
   dotsEl.addEventListener('click',function(e){
@@ -155,12 +220,28 @@ initVideoPlayers();
   });
  }
 
- // Touch/swipe
- var tx=0;
- track.addEventListener('touchstart',function(e){tx=e.touches[0].clientX;},{passive:true});
+ // Touch/swipe interaction for mobile
+ var tx=0,ty=0,tTime=0;
+ track.addEventListener('touchstart',function(e){
+  if(e.touches.length===1){
+   tx=e.touches[0].clientX;
+   ty=e.touches[0].clientY;
+   tTime=Date.now();
+  }
+ },{passive:true});
+
  track.addEventListener('touchend',function(e){
+  if(!e.changedTouches.length)return;
   var dx=e.changedTouches[0].clientX-tx;
-  if(Math.abs(dx)>40){dx<0?goTo(cur-1):goTo(cur+1);}
+  var dy=e.changedTouches[0].clientY-ty;
+  var dt=Date.now()-tTime;
+  if(Math.abs(dx)>35 && Math.abs(dx)>Math.abs(dy) && dt<650){
+   if(dx<0){
+    goTo(cur-1);
+   }else{
+    goTo(cur+1);
+   }
+  }
  },{passive:true});
 
  // Click on slide
@@ -204,26 +285,68 @@ document.addEventListener('click',function(e){
   document.querySelectorAll('#pg .card').forEach(function(c){
    var show=(!f.dataset.f||c.dataset.c===f.dataset.f);
    c.style.display=show?'':'none';
-   if(!show){var v=c.querySelector('video');if(v)v.pause();}
+   if(!show){
+    var v=c.querySelector('video');
+    if(v){
+     v.pause();
+     if(activeAudioVid===v){
+      v.muted=true;
+      v._mutedByScroll=false;
+      activeAudioVid=null;
+      var w=v.closest('.vp-wrap');
+      if(w)w.classList.add('is-muted');
+     }
+    }
+   }
   });
  }
 });
 
+// ── Video Viewport & Audio Observer ─────────────────────────────────
 if('IntersectionObserver' in window){
- var io=new IntersectionObserver(function(es){
+ var vio=new IntersectionObserver(function(es){
   es.forEach(function(e){
    var wrap=e.target;
    var v=wrap.querySelector('video');
    if(!v)return;
+
    if(e.isIntersecting){
-    v.muted=true;
-    v.play().catch(function(){});
+    // Video has entered the viewport
+    // 1. Restore previous audio state if this video was playing with sound when scrolled away
+    if(activeAudioVid===v && v._mutedByScroll){
+     v.muted=false;
+     v._mutedByScroll=false;
+     wrap.classList.remove('is-muted');
+     if(v._wasPlaying){
+      v.play().catch(function(){});
+      v._wasPlaying=false;
+     }
+    }else{
+     // 2. Play if active carousel slide or autoplay portfolio card
+     var slide=wrap.closest('.fc-slide');
+     if(slide){
+      if(slide.classList.contains('fc-active')){
+       v.play().catch(function(){});
+      }
+     }else if(wrap.dataset.ap==='1'){
+      v.play().catch(function(){});
+     }
+    }
    }else{
+    // Video has scrolled out of the viewport
+    // 1. If playing with sound, automatically mute it and remember to restore when back in view
+    if(!v.muted && !v.paused){
+     v._mutedByScroll=true;
+     v.muted=true;
+     v._wasPlaying=true;
+     wrap.classList.add('is-muted');
+    }
+    // 2. Pause video while out of view to preserve resources (playback position is preserved)
     v.pause();
    }
   });
- },{threshold:.5});
- document.querySelectorAll('#pg .vp-wrap[data-ap="1"]').forEach(function(t){io.observe(t)});
+ },{threshold:0.15});
+ document.querySelectorAll('.vp-wrap').forEach(function(t){vio.observe(t)});
 }
 
 // ── Scroll Reveal Observer ──────────────────────────────────────────
