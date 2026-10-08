@@ -302,9 +302,9 @@ document.addEventListener('click',function(e){
   var dt=Date.now()-tTime;
   if(Math.abs(dx)>35 && Math.abs(dx)>Math.abs(dy) && dt<650){
    if(dx<0){
-    goTo(cur-1,true);
-   }else{
     goTo(cur+1,true);
+   }else{
+    goTo(cur-1,true);
    }
   }
  },{passive:true});
