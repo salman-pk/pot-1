@@ -1,5 +1,6 @@
 *{box-sizing:border-box;margin:0}html{scroll-behavior:smooth}
-body{--glow:color-mix(in srgb,var(--o) 45%,transparent);background:var(--bg);color:var(--text);font:400 16px/1.6 Inter,system-ui,sans-serif;overflow-x:hidden}
+html,body{overflow-x:hidden;max-width:100%}
+body{--glow:color-mix(in srgb,var(--o) 45%,transparent);background:var(--bg);color:var(--text);font:400 16px/1.6 Inter,system-ui,sans-serif}
 a{color:inherit;text-decoration:none}:focus-visible{outline:2px solid var(--o);outline-offset:3px}
 .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
 h1,h2,h3{font-family:Anton,Impact,sans-serif;font-weight:400;line-height:1.05;text-transform:uppercase}
@@ -40,7 +41,7 @@ nav a:hover,nav a.on{color:var(--text);background:color-mix(in srgb,var(--o) 14%
 .card:hover .play{transform:scale(1.15)}
 .meta{padding:16px 18px}.meta h3{font-size:22px}.meta em{font-style:normal;color:var(--mute);font-size:13px}
 .sv{padding:26px}.sv h3{font-size:24px;margin-bottom:10px}.sv p{color:var(--mute);margin-bottom:12px}.sv strong{color:var(--o)}
-.filters{display:flex;gap:6px;flex-wrap:nowrap;margin-bottom:24px}
+.filters{display:flex;gap:8px 6px;flex-wrap:wrap;margin-bottom:24px}
 .filters button{white-space:nowrap;background:var(--card);color:var(--mute);border:1px solid var(--line);padding:6px 14px;border-radius:99px;cursor:pointer;font:inherit;font-size:14px;transition:.25s}
 .filters button:hover,.filters .on{color:var(--text);border-color:var(--o);box-shadow:0 0 18px var(--glow)}
 .more{margin-top:32px}
@@ -54,7 +55,7 @@ nav a:hover,nav a.on{color:var(--text);background:color-mix(in srgb,var(--o) 14%
 .sk.in-view .bar i{transform:scaleX(1)}
 .sk:hover .bar{box-shadow:0 0 22px var(--glow)}
 .contact{text-align:center}.contact .lead{margin-left:auto;margin-right:auto}.contact .cta,.contact .soc{justify-content:center}
-.mail{font:400 clamp(22px,4vw,40px) Anton,sans-serif;color:var(--o);display:inline-block;margin-bottom:26px;transition:.3s}.mail:hover{text-shadow:0 0 24px var(--o)}
+.mail{font:400 clamp(22px,4vw,40px) Anton,sans-serif;color:var(--o);display:inline-block;margin-bottom:26px;transition:.3s;word-break:break-word;max-width:100%}.mail:hover{text-shadow:0 0 24px var(--o)}
 footer{border-top:1px solid var(--line);margin-top:80px;padding:28px 0;text-align:center;color:var(--mute);font-size:14px}footer a{margin:0 8px}footer a:hover{color:var(--o)}
 .wa{position:fixed;right:18px;bottom:18px;background:#25d366;color:#fff;padding:12px 20px;border-radius:99px;font-weight:600;box-shadow:0 0 24px rgba(37,211,102,.45);z-index:20}
 .btn-wa,.wa,a[href*="wa.me"]{background:#25d366!important;color:#fff!important;border-color:#25d366!important;box-shadow:0 0 20px rgba(37,211,102,.35)!important}
@@ -71,9 +72,13 @@ footer{border-top:1px solid var(--line);margin-top:80px;padding:28px 0;text-alig
 #site-nav ul{flex-direction:column;gap:6px}
 #site-nav a{padding:10px 16px;font-size:15px;border-radius:10px;width:100%}
 #about .photo{display:none!important}
-.cta{gap:8px;flex-wrap:nowrap}
-.cta .btn{height:40px;padding:0 13px;font-size:13px;flex:1;min-width:0}
-.hero,.two,.skills{grid-template-columns:1fr}.photo{margin:0;max-width:300px;font-size:90px}}
+.cta{gap:8px;flex-wrap:wrap}
+.cta .btn{height:40px;padding:0 14px;font-size:13px;flex:1 1 auto;min-width:0}
+.hero,.two,.skills{grid-template-columns:1fr}
+.photo{margin:28px auto 0;max-width:min(300px,78vw);width:100%;justify-self:center;font-size:90px}
+.filters{justify-content:center;gap:8px 6px;max-width:100%;margin-left:auto;margin-right:auto}
+.filters button{font-size:13px;padding:6px 13px}
+.grid{grid-template-columns:1fr;gap:16px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.reveal,.reveal-scale{opacity:1!important;transform:none!important}.bar i{transform:none!important}}
 /* ── Modern Scroll-Based Animations ────────────────────────────── */
 .reveal{opacity:0;transform:translate3d(0,26px,0);transition:opacity .75s cubic-bezier(.16,1,.3,1),transform .75s cubic-bezier(.16,1,.3,1);will-change:opacity,transform}
@@ -122,7 +127,7 @@ html{scroll-padding-top:84px}.hero{margin-top:0}h2{scroll-margin-top:84px}
 /* ── Featured Carousel ─────────────────────────────────────────── */
 #featured{padding:0 0 60px;overflow:hidden}
 #featured h2{padding:0 24px;max-width:1120px;margin-left:auto;margin-right:auto}
-.fc-root{position:relative;display:flex;align-items:center;justify-content:center;padding:20px 0 10px}
+.fc-root{position:relative;display:flex;align-items:center;justify-content:center;padding:20px 0 10px;overflow:hidden;max-width:100%}
 .fc-track{display:flex;align-items:center;justify-content:center;position:relative;height:420px;width:100%;max-width:1200px;margin:0 auto;perspective:1200px;transform-style:preserve-3d}
 .fc-slide{position:absolute;width:580px;max-width:80vw;border-radius:20px;overflow:hidden;cursor:pointer;
   transition:transform .55s cubic-bezier(.4,0,.2,1),opacity .55s ease,box-shadow .55s ease;
@@ -141,14 +146,21 @@ html{scroll-padding-top:84px}.hero{margin-top:0}h2{scroll-margin-top:84px}
 .fc-ph{display:block;width:100%;height:100%;background:radial-gradient(55% 55% at 50% 45%,color-mix(in srgb,var(--o) 28%,transparent),transparent 75%)}
 .fc-info{padding:14px 18px;background:var(--card);border-top:1px solid var(--line)}
 .fc-info h3{font-size:clamp(14px,2.2vw,20px);margin:0;color:var(--text);font-family:Anton,sans-serif;font-weight:400;text-transform:uppercase;letter-spacing:.5px;line-height:1.2}
+.fc-slide .vp-center-play{display:none!important}
+.fc-slide:not(.fc-active) .vp-bar{display:none!important}
+.fc-slide.fc-active .vp-bar{position:absolute;bottom:12px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;z-index:20}
+@media(min-width:821px){
+  .fc-slide.fc-active .vp-bar{opacity:0;pointer-events:none;transform:translateY(4px);transition:opacity .25s ease,transform .25s ease}
+  .fc-slide.fc-active:hover .vp-bar{opacity:1;pointer-events:auto;transform:translateY(0)}
+}
 .fc-arr{position:absolute;top:50%;transform:translateY(-50%);z-index:25;
-  background:color-mix(in srgb,var(--bg) 85%,transparent);
-  border:1px solid var(--line);color:var(--text);
+  background:rgba(26,20,17,.92);
+  border:1.5px solid rgba(255,255,255,.3);color:#fff;
   width:48px;height:48px;border-radius:50%;font-size:28px;line-height:1;
   cursor:pointer;display:flex;align-items:center;justify-content:center;
-  transition:.25s;backdrop-filter:blur(10px);
-  box-shadow:0 4px 20px rgba(0,0,0,.5)}
-.fc-arr:hover{border-color:var(--o);color:var(--o);box-shadow:0 0 18px var(--glow);transform:translateY(-50%) scale(1.06)}
+  transition:.25s;backdrop-filter:blur(12px);
+  box-shadow:0 6px 24px rgba(0,0,0,.7),0 0 14px rgba(255,106,0,.18)}
+.fc-arr:hover{border-color:var(--o);color:var(--o);box-shadow:0 0 22px var(--glow),0 6px 24px rgba(0,0,0,.7);transform:translateY(-50%) scale(1.08)}
 .fc-prev{left:calc(50% - min(290px, 40vw) - 63px)}.fc-next{right:calc(50% - min(290px, 40vw) - 63px)}
 .fc-dots{display:flex;justify-content:center;gap:8px;margin-top:4px;padding-bottom:8px}
 .fc-dot{width:8px;height:8px;border-radius:50%;background:var(--line);border:0;cursor:pointer;padding:0;transition:.3s}
@@ -156,7 +168,7 @@ html{scroll-padding-top:84px}.hero{margin-top:0}h2{scroll-margin-top:84px}
 @media(max-width:820px){
   #featured{padding:0 0 40px}
   #featured h2{padding:0 16px}
-  .fc-root{padding:12px 0 8px}
+  .fc-root{padding:12px 0 8px;overflow:hidden}
   .fc-track{height:clamp(260px,58vw,340px);touch-action:pan-y}
   .fc-slide{width:76vw;max-width:440px;border-radius:16px}
   .fc-slide.fc-left{transform:translate3d(-64%,0,-80px) scale(.78);opacity:.65}
@@ -167,6 +179,7 @@ html{scroll-padding-top:84px}.hero{margin-top:0}h2{scroll-margin-top:84px}
   .vp-spinner{width:36px;height:36px}
   .vp-btn{width:36px;height:36px}
   .vp-bar{bottom:8px;left:8px;right:8px}
-  .fc-arr{width:38px;height:38px;font-size:22px;z-index:25}
-  .fc-prev{left:6px}.fc-next{right:6px}
+  .fc-slide.fc-active .vp-bar{opacity:1;pointer-events:auto}
+  .fc-arr{width:40px;height:40px;font-size:24px;z-index:25;border:1.5px solid rgba(255,255,255,.35);box-shadow:0 4px 18px rgba(0,0,0,.8)}
+  .fc-prev{left:8px}.fc-next{right:8px}
 }
